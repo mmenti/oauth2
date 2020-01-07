@@ -137,8 +137,6 @@ func (js jwtSource) Token() (*oauth2.Token, error) {
 	}
 	req.Header.Add("API-Version", "2")
 	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
-	// not sure if needed for HSDP, add in case
-	req.Header.Add("Origin", "https://iam-client-test.eu-west.philips-healthsuite.com")
 	resp, err := hc.Do(req)
 	if err != nil {
 		return nil, fmt.Errorf("oauth2: cannot fetch token: %v", err)

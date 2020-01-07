@@ -19,8 +19,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/mmenti/oauth2/internal"
 	"golang.org/x/oauth2"
-	"golang.org/x/oauth2/internal"
 	"golang.org/x/oauth2/jws"
 )
 
@@ -131,7 +131,15 @@ func (js jwtSource) Token() (*oauth2.Token, error) {
 	v := url.Values{}
 	v.Set("grant_type", defaultGrantType)
 	v.Set("assertion", payload)
-	resp, err := hc.PostForm(js.conf.TokenURL, v)
+	req, err := http.NewRequest("POST", js.conf.TokenURL, strings.NewReader(v.Encode()))
+	if err != nil {
+		return nil, fmt.Errorf("oauth2: cannot fetch token: %v", err)
+	}
+	req.Header.Add("API-Version", "2")
+	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
+	// not sure if needed for HSDP, add in case
+	req.Header.Add("Origin", "https://iam-client-test.eu-west.philips-healthsuite.com")
+	resp, err := hc.Do(req)
 	if err != nil {
 		return nil, fmt.Errorf("oauth2: cannot fetch token: %v", err)
 	}
